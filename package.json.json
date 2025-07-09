@@ -1,8 +1,9 @@
 {
-  "name": "compressor-api",
+  "name": "img-compress",
+  "version": "1.0.0",
   "type": "module",
   "dependencies": {
     "formidable": "^3.5.0",
-    "sharp": "^0.33.0"
+    "sharp": "^0.33.1"
   }
 }

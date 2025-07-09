@@ -1,8 +1,9 @@
 {
-  "builds": [
-    { "src": "api/compress.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/compress", "dest": "api/compress.js" }
-  ]
+  "version": 2,
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 10
+    }
+  }
 }

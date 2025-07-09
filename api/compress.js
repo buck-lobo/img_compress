@@ -1,37 +1,38 @@
 import formidable from 'formidable';
-import fs from 'fs';
 import sharp from 'sharp';
+import fs from 'fs';
 
 export const config = {
   api: {
-    bodyParser: false
-  }
+    bodyParser: false,
+  },
 };
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).send('Only POST allowed');
   }
 
-  const form = new formidable.IncomingForm({ keepExtensions: true });
+  const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
     if (err || !files.image) {
-      return res.status(400).json({ error: 'Invalid image' });
+      return res.status(400).send('Image not provided or error parsing');
     }
 
-    const imagePath = files.image.filepath;
-
     try {
-      const compressedBuffer = await sharp(imagePath)
-        .resize(1024) // largura máxima
-        .jpeg({ quality: 70 }) // compressão
+      const file = files.image[0];
+      const inputBuffer = fs.readFileSync(file.filepath);
+
+      const compressedBuffer = await sharp(inputBuffer)
+        .resize({ width: 1200 })        // você pode ajustar isso
+        .jpeg({ quality: 60 })          // controle de compressão
         .toBuffer();
 
       res.setHeader('Content-Type', 'image/jpeg');
       res.send(compressedBuffer);
-    } catch (err) {
-      res.status(500).json({ error: 'Compression failed' });
+    } catch (e) {
+      res.status(500).send('Compression failed: ' + e.message);
     }
   });
 }
