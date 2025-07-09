@@ -1,6 +1,5 @@
-import formidable from 'formidable';
-import sharp from 'sharp';
-import fs from 'fs';
+import sharp from "sharp";
+import formidable from "formidable-serverless";
 
 export const config = {
   api: {
@@ -9,30 +8,29 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).send('Only POST allowed');
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const form = formidable({ multiples: false });
+  const form = new formidable.IncomingForm();
 
   form.parse(req, async (err, fields, files) => {
     if (err || !files.image) {
-      return res.status(400).send('Image not provided or error parsing');
+      return res.status(400).json({ error: "No image uploaded" });
     }
 
     try {
-      const file = files.image[0];
-      const inputBuffer = fs.readFileSync(file.filepath);
-
-      const compressedBuffer = await sharp(inputBuffer)
-        .resize({ width: 1200 })        // você pode ajustar isso
-        .jpeg({ quality: 60 })          // controle de compressão
+      const imagePath = files.image.filepath;
+      const buffer = await sharp(imagePath)
+        .resize({ width: 1200 }) // opcional: redimensiona para largura máxima
+        .jpeg({ quality: 60 }) // compressão JPEG
         .toBuffer();
 
-      res.setHeader('Content-Type', 'image/jpeg');
-      res.send(compressedBuffer);
-    } catch (e) {
-      res.status(500).send('Compression failed: ' + e.message);
+      res.setHeader("Content-Type", "image/jpeg");
+      res.send(buffer);
+    } catch (error) {
+      console.error("Compression error:", error);
+      res.status(500).json({ error: "Compression failed" });
     }
   });
 }
