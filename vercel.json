@@ -1,0 +1,8 @@
+{
+  "builds": [
+    { "src": "api/compress.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/compress", "dest": "api/compress.js" }
+  ]
+}
