@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "api/compress.js": {
-      "memory": 300,
-      "maxDuration": 10
-    }
-  }
-}
